@@ -2,6 +2,36 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
+const banderas = {
+  // Anfitriones
+  'Estados Unidos': '🇺🇸', 'México': '🇲🇽', 'Canadá': '🇨🇦',
+  // CONMEBOL
+  'Argentina': '🇦🇷', 'Brasil': '🇧🇷', 'Colombia': '🇨🇴',
+  'Ecuador': '🇪🇨', 'Uruguay': '🇺🇾', 'Paraguay': '🇵🇾',
+  // UEFA
+  'España': '🇪🇸', 'Francia': '🇫🇷', 'Alemania': '🇩🇪',
+  'Portugal': '🇵🇹', 'Inglaterra': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Países Bajos': '🇳🇱',
+  'Bélgica': '🇧🇪', 'Austria': '🇦🇹', 'Suiza': '🇨🇭',
+  'Noruega': '🇳🇴', 'Suecia': '🇸🇪', 'Turquía': '🇹🇷',
+  'Escocia': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Bosnia': '🇧🇦', 'República Checa': '🇨🇿',
+  'Croacia': '🇭🇷',
+  // CONCACAF
+  'Panamá': '🇵🇦', 'Haití': '🇭🇹', 'Curazao': '🇨🇼',
+  // CAF
+  'Marruecos': '🇲🇦', 'Senegal': '🇸🇳', 'Egipto': '🇪🇬',
+  'Ghana': '🇬🇭', 'Argelia': '🇩🇿', 'Túnez': '🇹🇳',
+  'Costa de Marfil': '🇨🇮', 'Sudáfrica': '🇿🇦', 'Cabo Verde': '🇨🇻',
+  'RD Congo': '🇨🇩',
+  // AFC
+  'Japón': '🇯🇵', 'Corea del Sur': '🇰🇷', 'Australia': '🇦🇺',
+  'Irán': '🇮🇷', 'Arabia Saudita': '🇸🇦', 'Qatar': '🇶🇦',
+  'Uzbekistán': '🇺🇿', 'Jordania': '🇯🇴', 'Irak': '🇮🇶',
+  // OFC
+  'Nueva Zelanda': '🇳🇿',
+}
+
+const bandera = (equipo) => banderas[equipo] || '🏳️'
+
 export default function Predicciones() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -102,7 +132,9 @@ export default function Predicciones() {
                   return (
                     <div key={partido.id} className={`bg-gray-900 border rounded-xl px-5 py-4 ${bloqueado ? 'border-gray-700 opacity-60' : 'border-gray-800'}`}>
                       <div className="flex items-center justify-between gap-4">
-                        <span className="flex-1 text-right font-semibold">{partido.equipo_local}</span>
+                        <span className="flex-1 text-right font-semibold">
+                          {partido.equipo_local} {bandera(partido.equipo_local)}
+                        </span>
                         <div className="flex items-center gap-2">
                           <input
                             type="number" min="0" max="20"
@@ -120,7 +152,9 @@ export default function Predicciones() {
                             className="w-12 text-center bg-gray-800 border border-gray-700 rounded-lg py-1 text-white focus:outline-none focus:border-green-500 disabled:opacity-50"
                           />
                         </div>
-                        <span className="flex-1 font-semibold">{partido.equipo_visita}</span>
+                        <span className="flex-1 font-semibold">
+                          {bandera(partido.equipo_visita)} {partido.equipo_visita}
+                        </span>
                       </div>
                       {partido.fecha && (
                         <p className="text-center text-xs text-gray-500 mt-2">
