@@ -80,22 +80,25 @@ export default function Predicciones() {
   }, [id, navigate])
 
   function handleChange(partidoId, campo, valor) {
-    const num = Math.max(0, parseInt(valor) || 0)
+    const parsed = valor === '' ? '' : Math.max(0, parseInt(valor) || 0)
     setPredicciones(prev => ({
       ...prev,
-      [partidoId]: { ...prev[partidoId], [campo]: num }
+      [partidoId]: { ...prev[partidoId], [campo]: parsed }
     }))
   }
 
   async function guardar() {
     setGuardando(true)
     const inserts = partidos
-      .filter(p => predicciones[p.id] !== undefined)
+      .filter(p => {
+        const pred = predicciones[p.id]
+        return pred !== undefined && pred.gol_local !== '' && pred.gol_visita !== ''
+      })
       .map(p => ({
         participante_id: id,
         partido_id: p.id,
-        gol_local: predicciones[p.id]?.gol_local ?? 0,
-        gol_visita: predicciones[p.id]?.gol_visita ?? 0,
+        gol_local: predicciones[p.id].gol_local,
+        gol_visita: predicciones[p.id].gol_visita,
       }))
 
     await supabase
@@ -138,7 +141,7 @@ export default function Predicciones() {
               const fechaPartido = new Date(partido.fecha)
               const minutosRestantes = (fechaPartido - ahora) / 1000 / 60
               const bloqueado = partido.jugado || minutosRestantes < 60
-              const pred = predicciones[partido.id] || { gol_local: 0, gol_visita: 0 }
+              const pred = predicciones[partido.id] || { gol_local: '', gol_visita: '' }
               return (
                 <div key={partido.id} className={`bg-gray-900 border rounded-xl px-5 py-4 ${bloqueado ? 'border-gray-700 opacity-60' : 'border-gray-800'}`}>
 
@@ -156,18 +159,20 @@ export default function Predicciones() {
                     <div className="flex items-center gap-2">
                       <input
                         type="number" min="0" max="20"
-                        value={pred.gol_local}
+                        value={pred.gol_local === '' ? '' : pred.gol_local}
+                        placeholder="–"
                         onChange={e => handleChange(partido.id, 'gol_local', e.target.value)}
                         disabled={bloqueado}
-                        className="w-12 text-center bg-gray-800 border border-gray-700 rounded-lg py-1 text-white focus:outline-none focus:border-green-500 disabled:opacity-50"
+                        className="w-12 text-center bg-gray-800 border border-gray-700 rounded-lg py-1 text-white placeholder-gray-600 focus:outline-none focus:border-green-500 disabled:opacity-50"
                       />
                       <span className="text-gray-500 font-bold">-</span>
                       <input
                         type="number" min="0" max="20"
-                        value={pred.gol_visita}
+                        value={pred.gol_visita === '' ? '' : pred.gol_visita}
+                        placeholder="–"
                         onChange={e => handleChange(partido.id, 'gol_visita', e.target.value)}
                         disabled={bloqueado}
-                        className="w-12 text-center bg-gray-800 border border-gray-700 rounded-lg py-1 text-white focus:outline-none focus:border-green-500 disabled:opacity-50"
+                        className="w-12 text-center bg-gray-800 border border-gray-700 rounded-lg py-1 text-white placeholder-gray-600 focus:outline-none focus:border-green-500 disabled:opacity-50"
                       />
                     </div>
                     <span className="flex-1 font-semibold">
