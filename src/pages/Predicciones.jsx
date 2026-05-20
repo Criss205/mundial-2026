@@ -171,6 +171,15 @@ export default function Predicciones() {
                         : ''}
                     </p>
                   )}
+                  {minutosRestantes >= 60 && (
+                    <p className="text-center text-xs text-gray-400 mt-1">
+                      {minutosRestantes > 2880
+                        ? `📅 En ${Math.floor(minutosRestantes / 1440)} días`
+                        : minutosRestantes >= 1440
+                        ? `📅 Mañana a las ${new Date(partido.fecha).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago' })}`
+                        : `⏳ En ${Math.floor(minutosRestantes / 60)} horas`}
+                    </p>
+                  )}
                 </div>
               )
             })}
