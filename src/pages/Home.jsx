@@ -11,10 +11,16 @@ export default function Home() {
   }, [])
 
   async function cargarRanking() {
-    const { data: participantes } = await supabase
+    const { data: participantes, error } = await supabase
       .from('participantes')
       .select('*')
       .order('created_at', { ascending: true })
+
+    if (error || !participantes || participantes.length === 0) {
+      setRanking([])
+      setLoading(false)
+      return
+    }
 
     const { data: predicciones } = await supabase
       .from('predicciones')
@@ -24,56 +30,32 @@ export default function Home() {
       .from('partidos')
       .select('*')
       .eq('jugado', true)
-async function cargarRanking() {
-  const { data: participantes } = await supabase
-    .from('participantes').select('*').order('created_at', { ascending: true })
 
-  const { data: predicciones } = await supabase
-    .from('predicciones').select('*')
+    const ranking = participantes.map(p => {
+      const misPredicciones = (predicciones || []).filter(pr => pr.participante_id === p.id)
+      let puntos = 0
 
-  const { data: partidos } = await supabase
-    .from('partidos').select('*').eq('jugado', true)
+      misPredicciones.forEach(pred => {
+        const partido = (partidos || []).find(pa => pa.id === pred.partido_id)
+        if (!partido) return
 
-  const ranking = participantes.map(p => {
-    const misPredicciones = predicciones.filter(pr => pr.participante_id === p.id)
-    let puntos = 0
+        const gl = partido.gol_local_real
+        const gv = partido.gol_visita_real
+        const pl = pred.gol_local
+        const pv = pred.gol_visita
 
-    misPredicciones.forEach(pred => {
-      const partido = partidos.find(pa => pa.id === pred.partido_id)
-      if (!partido) return
+        if (pl === gl && pv === gv) { puntos += 4; return }
 
-      const gl = partido.gol_local_real
-      const gv = partido.gol_visita_real
-      const pl = pred.gol_local
-      const pv = pred.gol_visita
+        const ganadorReal = gl > gv ? 'local' : gl < gv ? 'visita' : 'empate'
+        const ganadorPred = pl > pv ? 'local' : pl < pv ? 'visita' : 'empate'
 
-      // Marcador exacto
-      if (pl === gl && pv === gv) {
-        puntos += 4
-        return
-      }
-
-      const ganadorReal = gl > gv ? 'local' : gl < gv ? 'visita' : 'empate'
-      const ganadorPred = pl > pv ? 'local' : pl < pv ? 'visita' : 'empate'
-
-      if (ganadorReal === ganadorPred) {
-        // Ganador correcto + diferencia exacta
-        if ((gl - gv) === (pl - pv)) {
-          puntos += 2
-        } else {
-          // Solo ganador correcto
-          puntos += 1
+        if (ganadorReal === ganadorPred) {
+          puntos += (gl - gv) === (pl - pv) ? 2 : 1
         }
-      }
+      })
+
+      return { ...p, puntos }
     })
-
-    return { ...p, puntos }
-  })
-
-  ranking.sort((a, b) => b.puntos - a.puntos)
-  setRanking(ranking)
-  setLoading(false)
-}
 
     ranking.sort((a, b) => b.puntos - a.puntos)
     setRanking(ranking)
