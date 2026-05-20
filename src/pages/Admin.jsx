@@ -31,13 +31,17 @@ export default function Admin() {
     setParticipantes(data || [])
   }
 
-  async function eliminarParticipante(id, nombre) {
-    if (!confirm(`¿Eliminar a ${nombre}? Se borrarán también todas sus predicciones.`)) return
-    await supabase.from('participantes').delete().eq('id', id)
+async function eliminarParticipante(id, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre}? Se borrarán también todas sus predicciones.`)) return
+  const { error } = await supabase.from('participantes').delete().eq('id', id)
+  if (error) {
+    setMsg('Error al eliminar ❌')
+  } else {
     setMsg(`${nombre} eliminado ✓`)
-    setTimeout(() => setMsg(''), 3000)
-    cargarParticipantes()
+    setParticipantes(prev => prev.filter(p => p.id !== id))
   }
+  setTimeout(() => setMsg(''), 3000)
+}
 
   async function agregarPartido() {
     if (!nuevoPartido.equipo_local || !nuevoPartido.equipo_visita) return
