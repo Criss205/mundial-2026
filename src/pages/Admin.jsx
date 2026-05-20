@@ -9,7 +9,6 @@ export default function Admin() {
   const [partidos, setPartidos] = useState([])
   const [participantes, setParticipantes] = useState([])
   const [resultados, setResultados] = useState({})
-  const [nuevoPartido, setNuevoPartido] = useState({ equipo_local: '', equipo_visita: '', fase: 'Grupos', fecha: '' })
   const [guardando, setGuardando] = useState(false)
   const [msg, setMsg] = useState('')
   const [tab, setTab] = useState('partidos')
@@ -43,13 +42,6 @@ async function eliminarParticipante(id, nombre) {
   }
   setTimeout(() => setMsg(''), 3000)
 }
-
-  async function agregarPartido() {
-    if (!nuevoPartido.equipo_local || !nuevoPartido.equipo_visita) return
-    await supabase.from('partidos').insert([nuevoPartido])
-    cargarPartidos()
-    setNuevoPartido({ equipo_local: '', equipo_visita: '', fase: 'Grupos', fecha: '' })
-  }
 
   async function guardarResultado(partidoId) {
     setGuardando(true)
@@ -111,34 +103,6 @@ async function eliminarParticipante(id, nombre) {
       {/* Tab Partidos */}
       {tab === 'partidos' && (
         <>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-8">
-            <h2 className="font-semibold text-lg mb-4">Agregar partido</h2>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <input placeholder="Equipo local" value={nuevoPartido.equipo_local}
-                onChange={e => setNuevoPartido(p => ({ ...p, equipo_local: e.target.value }))}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Equipo visita" value={nuevoPartido.equipo_visita}
-                onChange={e => setNuevoPartido(p => ({ ...p, equipo_visita: e.target.value }))}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500" />
-              <select value={nuevoPartido.fase}
-                onChange={e => setNuevoPartido(p => ({ ...p, fase: e.target.value }))}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500">
-                <option>Grupos</option>
-                <option>Octavos</option>
-                <option>Cuartos</option>
-                <option>Semifinal</option>
-                <option>Final</option>
-              </select>
-              <input type="datetime-local" value={nuevoPartido.fecha}
-                onChange={e => setNuevoPartido(p => ({ ...p, fecha: e.target.value }))}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500" />
-            </div>
-            <button onClick={agregarPartido}
-              className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-2 rounded-lg">
-              + Agregar partido
-            </button>
-          </div>
-
           <h2 className="font-semibold text-lg mb-4">Ingresar resultados</h2>
           <div className="space-y-3">
             {partidos.map(partido => (
