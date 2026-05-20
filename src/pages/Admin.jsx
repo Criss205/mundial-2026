@@ -162,9 +162,19 @@ async function eliminarParticipante(id, nombre) {
                     {partido.jugado ? 'Actualizar' : 'Guardar'}
                   </button>
                 </div>
-                {partido.jugado && (
-                  <p className="text-center text-xs text-green-500 mt-1">✓ Resultado oficial: {partido.gol_local_real} - {partido.gol_visita_real}</p>
-                )}
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-xs text-gray-500">
+                    {partido.fecha
+                      ? new Date(partido.fecha).toLocaleDateString('es-CL', {
+                          weekday: 'short', day: 'numeric', month: 'short',
+                          hour: '2-digit', minute: '2-digit'
+                        })
+                      : ''}
+                  </p>
+                  {partido.jugado && (
+                    <p className="text-xs text-green-500">✓ Resultado oficial: {partido.gol_local_real} - {partido.gol_visita_real}</p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
