@@ -23,7 +23,6 @@ const banderas = {
 
 const bandera = (equipo) => banderas[equipo] || '🏳️'
 
-// Equipos por grupo para mostrar contexto
 const grupos = {
   'Grupo A': ['México', 'Sudáfrica', 'Corea del Sur', 'República Checa'],
   'Grupo B': ['Canadá', 'Bosnia', 'Qatar', 'Suiza'],
@@ -103,6 +102,8 @@ export default function Predicciones() {
 
   if (loading) return <p className="text-center text-gray-400 mt-16">Cargando partidos...</p>
 
+  const ahora = new Date()
+
   return (
     <div>
       <div className="text-center mb-8">
@@ -126,7 +127,9 @@ export default function Predicciones() {
         <>
           <div className="space-y-3">
             {partidos.map(partido => {
-              const bloqueado = partido.jugado
+              const fechaPartido = new Date(partido.fecha)
+              const minutosRestantes = (fechaPartido - ahora) / 1000 / 60
+              const bloqueado = partido.jugado || minutosRestantes < 60
               const pred = predicciones[partido.id] || { gol_local: 0, gol_visita: 0 }
               const otrosEquipos = (grupos[partido.fase] || [])
                 .filter(e => e !== partido.equipo_local && e !== partido.equipo_visita)
@@ -134,7 +137,6 @@ export default function Predicciones() {
               return (
                 <div key={partido.id} className={`bg-gray-900 border rounded-xl px-5 py-4 ${bloqueado ? 'border-gray-700 opacity-60' : 'border-gray-800'}`}>
 
-                  {/* Badge grupo + otros equipos */}
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs font-semibold bg-gray-800 text-green-400 px-2 py-0.5 rounded-md">
                       {partido.fase}
@@ -146,7 +148,6 @@ export default function Predicciones() {
                     )}
                   </div>
 
-                  {/* Partido */}
                   <div className="flex items-center justify-between gap-4">
                     <span className="flex-1 text-right font-semibold">
                       {partido.equipo_local} {bandera(partido.equipo_local)}
@@ -173,14 +174,21 @@ export default function Predicciones() {
                     </span>
                   </div>
 
-                  {/* Fecha */}
                   {partido.fecha && (
                     <p className="text-center text-xs text-gray-500 mt-2">
-                      {new Date(partido.fecha).toLocaleDateString('es-CL', {
+                      {fechaPartido.toLocaleDateString('es-CL', {
                         weekday: 'short', day: 'numeric', month: 'short',
                         hour: '2-digit', minute: '2-digit'
                       })}
-                      {bloqueado && ' · 🔒 Bloqueado'}
+                      {partido.jugado
+                        ? ' · 🔒 Partido jugado'
+                        : minutosRestantes < 0
+                        ? ' · 🔒 En curso'
+                        : minutosRestantes < 60
+                        ? ' · 🔒 Predicciones cerradas'
+                        : minutosRestantes < 180
+                        ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
+                        : ''}
                     </p>
                   )}
                 </div>
