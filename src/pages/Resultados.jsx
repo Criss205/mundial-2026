@@ -22,20 +22,6 @@ const banderas = {
 
 const bandera = (equipo) => banderas[equipo] || '🏳️'
 
-const grupos = {
-  'Grupo A': ['México', 'Sudáfrica', 'Corea del Sur', 'República Checa'],
-  'Grupo B': ['Canadá', 'Bosnia', 'Qatar', 'Suiza'],
-  'Grupo C': ['Brasil', 'Marruecos', 'Escocia', 'Haití'],
-  'Grupo D': ['Estados Unidos', 'Paraguay', 'Australia', 'Turquía'],
-  'Grupo E': ['Alemania', 'Curazao', 'Costa de Marfil', 'Ecuador'],
-  'Grupo F': ['Países Bajos', 'Japón', 'Suecia', 'Túnez'],
-  'Grupo G': ['Bélgica', 'Egipto', 'Irán', 'Nueva Zelanda'],
-  'Grupo H': ['España', 'Cabo Verde', 'Arabia Saudita', 'Uruguay'],
-  'Grupo I': ['Francia', 'Senegal', 'Irak', 'Noruega'],
-  'Grupo J': ['Argentina', 'Argelia', 'Austria', 'Jordania'],
-  'Grupo K': ['Portugal', 'RD Congo', 'Uzbekistán', 'Colombia'],
-  'Grupo L': ['Inglaterra', 'Croacia', 'Ghana', 'Panamá'],
-}
 
 function Badge({ partido, minutosRestantes }) {
   if (partido.jugado) {
@@ -94,9 +80,6 @@ export default function Resultados() {
           {partidos.map(partido => {
             const fechaPartido = new Date(partido.fecha)
             const minutosRestantes = (fechaPartido - ahora) / 1000 / 60
-            const otrosEquipos = (grupos[partido.fase] || [])
-              .filter(e => e !== partido.equipo_local && e !== partido.equipo_visita)
-
             return (
               <div key={partido.id} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4">
                 <div className="flex items-center gap-2 mb-3">
@@ -104,11 +87,6 @@ export default function Resultados() {
                     {partido.fase}
                   </span>
                   <Badge partido={partido} minutosRestantes={minutosRestantes} />
-                  {otrosEquipos.length > 0 && (
-                    <span className="text-xs text-gray-600">
-                      también: {otrosEquipos.map(e => `${bandera(e)} ${e}`).join('  ·  ')}
-                    </span>
-                  )}
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
