@@ -116,6 +116,7 @@ export default function Predicciones() {
           <span className="text-gray-600">|</span>
           <span className="text-gray-400">✓ Solo ganador <span className="text-blue-400 font-bold">1 pt</span></span>
         </div>
+        <p className="text-xs text-gray-600 mt-2">⏱ Las predicciones se cierran automáticamente 1 hora antes de cada partido</p>
       </div>
 
       {partidos.length === 0 ? (
@@ -175,31 +176,21 @@ export default function Predicciones() {
                   </div>
 
                   {partido.fecha && (
-                    <div className="text-center text-xs text-gray-500 mt-2 space-y-0.5">
-                      <p>
-                        Partido: {fechaPartido.toLocaleDateString('es-CL', {
-                          weekday: 'short', day: 'numeric', month: 'short',
-                          hour: '2-digit', minute: '2-digit', hour12: false
-                        })}
-                        {partido.jugado
-                          ? ' · 🔒 Partido jugado'
-                          : minutosRestantes < 0
-                          ? ' · 🔒 En curso'
-                          : minutosRestantes < 60
-                          ? ' · 🔒 Predicciones cerradas'
-                          : minutosRestantes < 180
-                          ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
-                          : ''}
-                      </p>
-                      {minutosRestantes >= 60 && (
-                        <p>
-                          Cierra: {new Date(fechaPartido - 60 * 60 * 1000).toLocaleDateString('es-CL', {
-                            weekday: 'short', day: 'numeric', month: 'short',
-                            hour: '2-digit', minute: '2-digit', hour12: false
-                          })}
-                        </p>
-                      )}
-                    </div>
+                    <p className="text-center text-xs text-gray-500 mt-2">
+                      Partido: {fechaPartido.toLocaleDateString('es-CL', {
+                        weekday: 'short', day: 'numeric', month: 'short',
+                        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago'
+                      })}
+                      {partido.jugado
+                        ? ' · 🔒 Partido jugado'
+                        : minutosRestantes < 0
+                        ? ' · 🔒 En curso'
+                        : minutosRestantes < 60
+                        ? ' · 🔒 Predicciones cerradas'
+                        : minutosRestantes < 180
+                        ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
+                        : ''}
+                    </p>
                   )}
                 </div>
               )
