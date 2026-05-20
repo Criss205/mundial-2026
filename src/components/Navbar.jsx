@@ -9,6 +9,7 @@ export default function Navbar() {
         </Link>
         <div className="flex gap-4 text-sm">
           <Link to="/" className="text-gray-300 hover:text-white transition">Ranking</Link>
+          <Link to="/resultados" className="text-gray-300 hover:text-white transition">Resultados</Link>
           <Link to="/registro" className="bg-green-500 hover:bg-green-400 text-black font-semibold px-3 py-1 rounded transition">
             Participar
           </Link>

@@ -89,7 +89,6 @@ export default function Home() {
                 <span className="text-2xl w-8">{medallas[i] || `#${i + 1}`}</span>
                 <div>
                   <p className="font-semibold text-white">{p.nombre}</p>
-                  <p className="text-sm text-gray-500">{p.email}</p>
                 </div>
               </div>
               <div className="text-right">

@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Registro from './pages/Registro'
 import Predicciones from './pages/Predicciones'
 import Admin from './pages/Admin'
+import Resultados from './pages/Resultados'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/registro" element={<Registro />} />
             <Route path="/predicciones/:id" element={<Predicciones />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/resultados" element={<Resultados />} />
           </Routes>
         </main>
       </div>
