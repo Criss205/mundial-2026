@@ -23,20 +23,6 @@ const banderas = {
 
 const bandera = (equipo) => banderas[equipo] || '🏳️'
 
-const grupos = {
-  'Grupo A': ['México', 'Sudáfrica', 'Corea del Sur', 'República Checa'],
-  'Grupo B': ['Canadá', 'Bosnia', 'Qatar', 'Suiza'],
-  'Grupo C': ['Brasil', 'Marruecos', 'Escocia', 'Haití'],
-  'Grupo D': ['Estados Unidos', 'Paraguay', 'Australia', 'Turquía'],
-  'Grupo E': ['Alemania', 'Curazao', 'Costa de Marfil', 'Ecuador'],
-  'Grupo F': ['Países Bajos', 'Japón', 'Suecia', 'Túnez'],
-  'Grupo G': ['Bélgica', 'Egipto', 'Irán', 'Nueva Zelanda'],
-  'Grupo H': ['España', 'Cabo Verde', 'Arabia Saudita', 'Uruguay'],
-  'Grupo I': ['Francia', 'Senegal', 'Irak', 'Noruega'],
-  'Grupo J': ['Argentina', 'Argelia', 'Austria', 'Jordania'],
-  'Grupo K': ['Portugal', 'RD Congo', 'Uzbekistán', 'Colombia'],
-  'Grupo L': ['Inglaterra', 'Croacia', 'Ghana', 'Panamá'],
-}
 
 export default function Predicciones() {
   const { id } = useParams()
@@ -48,29 +34,30 @@ export default function Predicciones() {
   const [guardando, setGuardando] = useState(false)
   const [guardado, setGuardado] = useState(false)
 
-  useEffect(() => { cargarDatos() }, [id])
+  useEffect(() => {
+    async function cargarDatos() {
+      const { data: part } = await supabase
+        .from('participantes').select('*').eq('id', id).single()
+      if (!part) { navigate('/registro'); return }
+      setParticipante(part)
 
-  async function cargarDatos() {
-    const { data: part } = await supabase
-      .from('participantes').select('*').eq('id', id).single()
-    if (!part) { navigate('/registro'); return }
-    setParticipante(part)
+      const { data: partidos } = await supabase
+        .from('partidos').select('*').order('fecha', { ascending: true })
 
-    const { data: partidos } = await supabase
-      .from('partidos').select('*').order('fecha', { ascending: true })
+      const { data: preds } = await supabase
+        .from('predicciones').select('*').eq('participante_id', id)
 
-    const { data: preds } = await supabase
-      .from('predicciones').select('*').eq('participante_id', id)
+      const predsMap = {}
+      preds?.forEach(p => {
+        predsMap[p.partido_id] = { gol_local: p.gol_local, gol_visita: p.gol_visita }
+      })
 
-    const predsMap = {}
-    preds?.forEach(p => {
-      predsMap[p.partido_id] = { gol_local: p.gol_local, gol_visita: p.gol_visita }
-    })
-
-    setPartidos(partidos || [])
-    setPredicciones(predsMap)
-    setLoading(false)
-  }
+      setPartidos(partidos || [])
+      setPredicciones(predsMap)
+      setLoading(false)
+    }
+    cargarDatos()
+  }, [id, navigate])
 
   function handleChange(partidoId, campo, valor) {
     const num = Math.max(0, parseInt(valor) || 0)
@@ -132,9 +119,6 @@ export default function Predicciones() {
               const minutosRestantes = (fechaPartido - ahora) / 1000 / 60
               const bloqueado = partido.jugado || minutosRestantes < 60
               const pred = predicciones[partido.id] || { gol_local: 0, gol_visita: 0 }
-              const otrosEquipos = (grupos[partido.fase] || [])
-                .filter(e => e !== partido.equipo_local && e !== partido.equipo_visita)
-
               return (
                 <div key={partido.id} className={`bg-gray-900 border rounded-xl px-5 py-4 ${bloqueado ? 'border-gray-700 opacity-60' : 'border-gray-800'}`}>
 
@@ -142,11 +126,6 @@ export default function Predicciones() {
                     <span className="text-xs font-semibold bg-gray-800 text-green-400 px-2 py-0.5 rounded-md">
                       {partido.fase}
                     </span>
-                    {otrosEquipos.length > 0 && (
-                      <span className="text-xs text-gray-600">
-                        también: {otrosEquipos.map(e => `${bandera(e)} ${e}`).join('  ·  ')}
-                      </span>
-                    )}
                   </div>
 
                   <div className="flex items-center justify-between gap-4">
