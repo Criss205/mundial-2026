@@ -175,21 +175,31 @@ export default function Predicciones() {
                   </div>
 
                   {partido.fecha && (
-                    <p className="text-center text-xs text-gray-500 mt-2">
-                      {fechaPartido.toLocaleDateString('es-CL', {
-                        weekday: 'short', day: 'numeric', month: 'short',
-                        hour: '2-digit', minute: '2-digit', hour12: false
-                      })}
-                      {partido.jugado
-                        ? ' · 🔒 Partido jugado'
-                        : minutosRestantes < 0
-                        ? ' · 🔒 En curso'
-                        : minutosRestantes < 60
-                        ? ' · 🔒 Predicciones cerradas'
-                        : minutosRestantes < 180
-                        ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
-                        : ''}
-                    </p>
+                    <div className="text-center text-xs text-gray-500 mt-2 space-y-0.5">
+                      <p>
+                        Partido: {fechaPartido.toLocaleDateString('es-CL', {
+                          weekday: 'short', day: 'numeric', month: 'short',
+                          hour: '2-digit', minute: '2-digit', hour12: false
+                        })}
+                        {partido.jugado
+                          ? ' · 🔒 Partido jugado'
+                          : minutosRestantes < 0
+                          ? ' · 🔒 En curso'
+                          : minutosRestantes < 60
+                          ? ' · 🔒 Predicciones cerradas'
+                          : minutosRestantes < 180
+                          ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
+                          : ''}
+                      </p>
+                      {minutosRestantes >= 60 && (
+                        <p>
+                          Cierra: {new Date(fechaPartido - 60 * 60 * 1000).toLocaleDateString('es-CL', {
+                            weekday: 'short', day: 'numeric', month: 'short',
+                            hour: '2-digit', minute: '2-digit', hour12: false
+                          })}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
               )
