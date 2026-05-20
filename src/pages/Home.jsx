@@ -31,7 +31,7 @@ export default function Home() {
       .select('*')
       .eq('jugado', true)
 
-    const ranking = participantes.map(p => {
+    const rankingCalculado = participantes.map(p => {
       const misPredicciones = (predicciones || []).filter(pr => pr.participante_id === p.id)
       let puntos = 0
 
@@ -57,8 +57,8 @@ export default function Home() {
       return { ...p, puntos }
     })
 
-    ranking.sort((a, b) => b.puntos - a.puntos)
-    setRanking(ranking)
+    rankingCalculado.sort((a, b) => b.puntos - a.puntos)
+    setRanking(rankingCalculado)
     setLoading(false)
   }
 

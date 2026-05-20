@@ -33,6 +33,7 @@ export default function Admin() {
 
 async function eliminarParticipante(id, nombre) {
   if (!confirm(`¿Eliminar a ${nombre}? Se borrarán también todas sus predicciones.`)) return
+  await supabase.from('predicciones').delete().eq('participante_id', id)
   const { error } = await supabase.from('participantes').delete().eq('id', id)
   if (error) {
     setMsg('Error al eliminar ❌')
@@ -53,12 +54,12 @@ async function eliminarParticipante(id, nombre) {
   async function guardarResultado(partidoId) {
     setGuardando(true)
     const r = resultados[partidoId]
-    await supabase.from('partidos').update({
+    const { error } = await supabase.from('partidos').update({
       gol_local_real: parseInt(r.gol_local),
       gol_visita_real: parseInt(r.gol_visita),
       jugado: true
     }).eq('id', partidoId)
-    setMsg('Resultado guardado ✓')
+    setMsg(error ? 'Error al guardar ❌' : 'Resultado guardado ✓')
     setTimeout(() => setMsg(''), 2000)
     setGuardando(false)
     cargarPartidos()
