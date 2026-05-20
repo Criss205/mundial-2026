@@ -178,7 +178,7 @@ export default function Predicciones() {
                     <p className="text-center text-xs text-gray-500 mt-2">
                       {fechaPartido.toLocaleDateString('es-CL', {
                         weekday: 'short', day: 'numeric', month: 'short',
-                        hour: '2-digit', minute: '2-digit'
+                        hour: '2-digit', minute: '2-digit', hour12: false
                       })}
                       {partido.jugado
                         ? ' · 🔒 Partido jugado'
