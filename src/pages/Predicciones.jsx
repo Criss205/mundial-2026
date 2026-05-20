@@ -23,6 +23,26 @@ const banderas = {
 
 const bandera = (equipo) => banderas[equipo] || '🏳️'
 
+function Badge({ partido, minutosRestantes }) {
+  if (partido.jugado) {
+    return <span className="text-xs font-semibold bg-green-900 text-green-400 px-2 py-0.5 rounded-md">✓ Jugado</span>
+  }
+  if (minutosRestantes < 0) {
+    return <span className="text-xs font-semibold bg-yellow-900 text-yellow-400 px-2 py-0.5 rounded-md">⚽ En curso</span>
+  }
+  if (minutosRestantes < 60) {
+    return <span className="text-xs font-semibold bg-orange-900 text-orange-400 px-2 py-0.5 rounded-md">🔒 Próximo</span>
+  }
+  if (minutosRestantes < 1440) {
+    const hora = new Date(partido.fecha).toLocaleTimeString('es-CL', {
+      hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago'
+    })
+    return <span className="text-xs font-semibold bg-blue-900 text-blue-400 px-2 py-0.5 rounded-md">⏳ Hoy {hora}</span>
+  }
+  const dias = Math.round(minutosRestantes / 1440)
+  const label = dias < 1 ? `En ${Math.floor(minutosRestantes / 60)} h` : `En ${dias} d`
+  return <span className="text-xs font-semibold bg-gray-800 text-gray-400 px-2 py-0.5 rounded-md">📅 {label}</span>
+}
 
 export default function Predicciones() {
   const { id } = useParams()
@@ -126,6 +146,7 @@ export default function Predicciones() {
                     <span className="text-xs font-semibold bg-gray-800 text-green-400 px-2 py-0.5 rounded-md">
                       {partido.fase}
                     </span>
+                    <Badge partido={partido} minutosRestantes={minutosRestantes} />
                   </div>
 
                   <div className="flex items-center justify-between gap-4">
@@ -160,19 +181,11 @@ export default function Predicciones() {
                         weekday: 'short', day: 'numeric', month: 'short',
                         hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago'
                       })}
-                      {partido.jugado
+                      {bloqueado && (partido.jugado
                         ? ' · 🔒 Partido jugado'
                         : minutosRestantes < 0
                         ? ' · 🔒 En curso'
-                        : minutosRestantes < 60
-                        ? ' · 🔒 Predicciones cerradas'
-                        : minutosRestantes < 180
-                        ? ` · ⏳ Cierra en ${Math.floor(minutosRestantes)} min`
-                        : minutosRestantes > 2880
-                        ? ` · 📅 En ${Math.floor(minutosRestantes / 1440)} días`
-                        : minutosRestantes >= 1440
-                        ? ` · 📅 Mañana a las ${new Date(partido.fecha).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Santiago' })}`
-                        : ` · ⏳ En ${Math.floor(minutosRestantes / 60)} horas`}
+                        : ' · 🔒 Predicciones cerradas')}
                     </p>
                   )}
                 </div>
